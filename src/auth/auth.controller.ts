@@ -39,19 +39,42 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('login')
   async login(@Body() loginDto: LoginInput) {
-    const token = await this.authService.login(loginDto);
+    const tokens = await this.authService.login(loginDto);
+    console.log('tokens', tokens);
     return {
       status: 200,
       message: "Logged in successfully",
-      data: {
-        accessToken: token,
-      }
+      data: tokens
     }
   }
 
+  @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
   @Get('profile')
   async getProfile(@Request() req) {
     return req.user;
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('refresh')
+  async refreshToken(@Request() req, @Body() body) {
+    const {refreshToken} = body;
+    if (!refreshToken) {
+      throw new HttpException("A refresh token is required", HttpStatus.BAD_REQUEST);
+    }
+    try {
+      const payload = await this.authService.validateToken(refreshToken);
+      if (payload.type === 'refresh') {
+        const user = payload.sub;
+        const tokens = await this.authService.renewTokens(user);
+        return {
+          status: 200,
+          message: "Success",
+          data: tokens
+        };
+      } else throw new HttpException("Only refresh token can be used", HttpStatus.FORBIDDEN);
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.FORBIDDEN);
+    }
   }
 }
