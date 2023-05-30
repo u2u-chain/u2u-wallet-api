@@ -21,9 +21,6 @@ export class UsersService {
   ) {
   }
   async createUser(input: CreateUserInput) {
-    const myAccountId = TREASURE_ACCOUNT_ID;
-    const myPrivateKey = TREASURE_ACCOUNT_PRIVATE_KEY;
-
     const check = await this.userModel.exists({
       email: input.email
     });
@@ -43,6 +40,34 @@ export class UsersService {
       console.log(e);
       throw new HttpException("Cannot create account with this information", HttpStatus.BAD_REQUEST)
     }
+  }
+
+  async createHederaAccount() {
+    const treasureAccountId = TREASURE_ACCOUNT_ID;
+    const treasureAccountPrivateKey = TREASURE_ACCOUNT_PRIVATE_KEY;
+    if (treasureAccountId && treasureAccountPrivateKey) {
+      throw new HttpException("System has not been properly configured", HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    const client = Client.forTestnet();
+
+    client.setOperator(treasureAccountId, treasureAccountPrivateKey);
+
+    const newAccountPrivateKey = PrivateKey.generateED25519();
+    const newAccountPublicKey = newAccountPrivateKey.publicKey;
+
+    const newAccount = await new AccountCreateTransaction()
+      .setKey(newAccountPublicKey)
+      .setInitialBalance(Hbar.fromTinybars(0))
+      .execute(client);
+
+    const getReceipt = await newAccount.getReceipt(client);
+    const newAccountId = getReceipt.accountId;
+    const accountBalance = await new AccountBalanceQuery()
+      .setAccountId(newAccountId)
+      .execute(client);
+
+    return newAccountId;
   }
 
   getUserById(id: string) {
