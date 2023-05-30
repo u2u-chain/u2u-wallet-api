@@ -44,6 +44,15 @@ export class User extends Document {
 
   @Prop({ default: false })
   emailVerified: boolean;
+
+  @Prop()
+  facebookId: string;
+
+  @Prop()
+  googleId: string;
+
+  @Prop()
+  githubId: string;
 }
 
 export type UserDocument = User & Document;
