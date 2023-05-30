@@ -16,6 +16,6 @@ export class AuthService {
 
   async login(loginData: LoginInput) {
     const account = await this.usersService.authenticate(loginData.email, loginData.password);
-    return this.jwtService.signAsync(account)
+    return this.jwtService.signAsync(account);
   }
 }

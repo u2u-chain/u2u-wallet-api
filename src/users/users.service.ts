@@ -3,8 +3,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { User, UserDocument } from "./user.model";
 import { PaginateModel } from "mongoose";
 import { CreateUserInput } from "./users.dto";
-import { compareSync, hashSync } from "bcrypt";
-import * as process from "process";
+import { compareSync, genSalt, hashSync } from "bcrypt";
 
 @Injectable()
 export class UsersService {
@@ -21,14 +20,16 @@ export class UsersService {
       throw new HttpException("Email already been used", HttpStatus.BAD_REQUEST);
     }
     try {
+      const salt = await genSalt(parseInt(process.env.PASSWORD_SALT_SIZE));
       const newUser = (await this.userModel.create({
         ...input,
-        password: hashSync(input.password, process.env.PASSWORD_SALT),
+        password: hashSync(input.password, salt),
         emailVerified: false,
       })).toObject();
       delete newUser.password;
       return newUser;
     } catch (e) {
+      console.log(e);
       throw new HttpException("Cannot create account with this information", HttpStatus.BAD_REQUEST)
     }
   }
