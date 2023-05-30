@@ -15,6 +15,8 @@ WORKDIR /user/src/app
 
 COPY --from=install-dependencies /user/src/app ./
 
+RUN yarn
+
 RUN yarn build
 
 USER node
