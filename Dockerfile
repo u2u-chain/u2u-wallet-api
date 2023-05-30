@@ -2,7 +2,7 @@ FROM node:18-alpine AS install-dependencies
 
 WORKDIR /user/src/app
 
-COPY package.json package-lock.json ./
+COPY package.json yarn.lock ./
 
 RUN npm ci --omit=dev
 
