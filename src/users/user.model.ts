@@ -17,10 +17,7 @@ export class User extends Document {
   id: number;
 
   @Prop({ required: true })
-  firstName: string;
-
-  @Prop({ required: true })
-  lastName: string;
+  fullName: string;
 
   @Prop({
     required: true,
@@ -44,12 +41,6 @@ export class User extends Document {
     select: false
   })
   password: string;
-
-  @Prop({ required: true })
-  gender: string;
-
-  @Prop({ required: true })
-  dateOfBirth: Date;
 
   @Prop({ default: false })
   emailVerified: boolean;

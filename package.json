@@ -27,6 +27,7 @@
     "@nestjs/mongoose": "^9.2.2",
     "@nestjs/platform-express": "^9.0.0",
     "@typegoose/auto-increment": "^3.2.0",
+    "@types/bcrypt": "^5.0.0",
     "bcrypt": "^5.1.0",
     "mongoose": "^7.2.1",
     "mongoose-paginate-v2": "^1.7.1",
