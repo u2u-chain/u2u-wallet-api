@@ -7,10 +7,12 @@ import {
   HttpException,
   HttpStatus,
   Param,
-  Post
+  Post, UseGuards,
+  Request
 } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { CreateUserInput, LoginInput } from "../users/users.dto";
+import { AuthGuard } from "./auth.guard";
 
 @Controller('auth')
 export class AuthController {
@@ -37,7 +39,6 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('login')
   async login(@Body() loginDto: LoginInput) {
-    console.log('login');
     const token = await this.authService.login(loginDto);
     return {
       status: 200,
@@ -46,5 +47,11 @@ export class AuthController {
         accessToken: token,
       }
     }
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('profile')
+  async getProfile(@Request() req) {
+    return req.user;
   }
 }
