@@ -7,12 +7,13 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER } from "@nestjs/core";
 import { HttpExceptionFilter } from "./common/exceptions/CustomExceptionFilter";
+import { MONGO_URI } from "./common/configs/env";
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    MongooseModule.forRoot(process.env.MONGO_URI),
     AuthModule,
+    MongooseModule.forRoot(MONGO_URI),
   ],
   controllers: [AppController],
   providers: [{

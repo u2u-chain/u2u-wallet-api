@@ -3,6 +3,7 @@ import { CreateUserInput, LoginInput } from "../users/users.dto";
 import { UsersService } from "../users/users.service";
 import { JwtService } from "@nestjs/jwt";
 import { User, UserDocument } from "../users/user.model";
+import { JWT_ISSUER, JWT_REFRESH_TOKEN_LIFESPAN, JWT_SECRET } from "../common/configs/env";
 
 @Injectable()
 export class AuthService {
@@ -23,15 +24,15 @@ export class AuthService {
   async signTokens(user: UserDocument) {
     const accessToken = await this.jwtService.signAsync({
       sub: user.id,
-      iss: process.env.JWT_ISSUER,
+      iss: JWT_ISSUER,
       type: 'access'
     });
     const refreshToken = await this.jwtService.signAsync({
       sub: user.id,
-      iss: process.env.JWT_ISSUER,
+      iss: JWT_ISSUER,
       type: 'refresh'
     }, {
-      expiresIn: process.env.JWT_REFRESH_TOKEN_LIFESPAN
+      expiresIn: JWT_REFRESH_TOKEN_LIFESPAN
     });
     return {
       accessToken,
@@ -41,7 +42,7 @@ export class AuthService {
 
   async validateToken(token: string) {
     return this.jwtService.verifyAsync(token, {
-      secret: process.env.JWT_SECRET
+      secret: JWT_SECRET
     });
   }
 

@@ -1,8 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { HttpException, HttpStatus, ValidationError, ValidationPipe } from "@nestjs/common";
-
-const port = process.env.PORT;
+import { APP_PORT } from "./common/configs/env";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,8 +11,8 @@ async function bootstrap() {
       return new HttpException(firstError[Object.keys(firstError)[0]], HttpStatus.BAD_REQUEST);
     }
   }));
-  await app.listen(port);
+  await app.listen(APP_PORT);
 }
 bootstrap().then(() => {
-  console.log('Listening on port', port);
+  console.log('Listening on port', APP_PORT);
 });

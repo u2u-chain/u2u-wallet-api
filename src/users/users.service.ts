@@ -4,6 +4,14 @@ import { User, UserDocument } from "./user.model";
 import { PaginateModel } from "mongoose";
 import { CreateUserInput } from "./users.dto";
 import { compareSync, genSalt, hashSync } from "bcrypt";
+import { PASSWORD_SALT_SIZE, TREASURE_ACCOUNT_ID, TREASURE_ACCOUNT_PRIVATE_KEY } from "../common/configs/env";
+const {
+  Client,
+  PrivateKey,
+  AccountCreateTransaction,
+  AccountBalanceQuery,
+  Hbar,
+} = require("@hashgraph/sdk");
 
 @Injectable()
 export class UsersService {
@@ -13,6 +21,9 @@ export class UsersService {
   ) {
   }
   async createUser(input: CreateUserInput) {
+    const myAccountId = TREASURE_ACCOUNT_ID;
+    const myPrivateKey = TREASURE_ACCOUNT_PRIVATE_KEY;
+
     const check = await this.userModel.exists({
       email: input.email
     });
@@ -20,7 +31,7 @@ export class UsersService {
       throw new HttpException("Email already been used", HttpStatus.BAD_REQUEST);
     }
     try {
-      const salt = await genSalt(parseInt(process.env.PASSWORD_SALT_SIZE));
+      const salt = await genSalt(parseInt(PASSWORD_SALT_SIZE));
       const newUser = (await this.userModel.create({
         ...input,
         password: hashSync(input.password, salt),
