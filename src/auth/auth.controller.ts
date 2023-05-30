@@ -10,19 +10,13 @@ import {
   Post
 } from "@nestjs/common";
 import { AuthService } from "./auth.service";
-import { CreateUserInput } from "../users/users.dto";
+import { CreateUserInput, LoginInput } from "../users/users.dto";
 
 @Controller('auth')
 export class AuthController {
   constructor(
-    private authService: AuthService
+    private authService: AuthService,
   ) {
-  }
-
-  @HttpCode(HttpStatus.OK)
-  @Post('login')
-  signIn(@Body() signInDto: Record<string, any>) {
-    // return this.authService.signIn(signInDto.username, signInDto.password);
   }
 
   @HttpCode(HttpStatus.OK)
@@ -37,6 +31,20 @@ export class AuthController {
       };
     } catch (e) {
       throw new HttpException(e.message || 'Invalid registration info', HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('login')
+  async login(@Body() loginDto: LoginInput) {
+    console.log('login');
+    const token = await this.authService.login(loginDto);
+    return {
+      status: 200,
+      message: "Logged in successfully",
+      data: {
+        accessToken: token,
+      }
     }
   }
 }

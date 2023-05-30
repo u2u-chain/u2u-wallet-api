@@ -3,7 +3,8 @@ import { InjectModel } from "@nestjs/mongoose";
 import { User, UserDocument } from "./user.model";
 import { PaginateModel } from "mongoose";
 import { CreateUserInput } from "./users.dto";
-import {hashSync} from "bcrypt";
+import { compareSync, hashSync } from "bcrypt";
+import * as process from "process";
 
 @Injectable()
 export class UsersService {
@@ -22,7 +23,7 @@ export class UsersService {
     try {
       const newUser = (await this.userModel.create({
         ...input,
-        password: hashSync(input.password, 10),
+        password: hashSync(input.password, process.env.PASSWORD_SALT),
         emailVerified: false,
       })).toObject();
       delete newUser.password;
@@ -31,14 +32,29 @@ export class UsersService {
       throw new HttpException("Cannot create account with this information", HttpStatus.BAD_REQUEST)
     }
   }
+
   getUserById(id: string) {
     return this.userModel.findOne({
       id,
     });
   }
+
   findUserByEmail(email: string) {
     return this.userModel.findOne({
       email: email
     });
+  }
+
+  async authenticate(email: string, password: string) {
+    const account = await this.userModel.findOne({
+      email,
+    }).select('+password');
+    if (!account || !compareSync(password, account.password)) {
+      throw new HttpException('Invalid email or password', HttpStatus.FORBIDDEN);
+    }
+    const accountJSON = account.toJSON();
+    delete accountJSON.password;
+    console.log(accountJSON);
+    return accountJSON;
   }
 }
