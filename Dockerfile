@@ -4,6 +4,8 @@ WORKDIR /user/src/app
 
 COPY package.json yarn.lock ./
 
+RUN yarn install
+
 COPY . .
 
 
@@ -14,8 +16,6 @@ FROM node:16-alpine AS create-build
 WORKDIR /user/src/app
 
 COPY --from=install-dependencies /user/src/app ./
-
-RUN yarn
 
 RUN yarn build
 
