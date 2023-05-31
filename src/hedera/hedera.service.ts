@@ -24,9 +24,9 @@ export class HederaService {
       throw new HttpException("Server has not been properly configured", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    const node = {HEDERA_NODE_ADDRESS: new AccountId(parseInt(HEDERA_NODE_ACCOUNT_ID))};
     let client;
     if (HEDERA_NODE_ADDRESS) {
+      const node = {[HEDERA_NODE_ADDRESS]: new AccountId(parseInt(HEDERA_NODE_ACCOUNT_ID))};
       client = Client.forNetwork(node);
     } else {
       console.log('Note: Testnet is being used.')
