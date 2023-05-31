@@ -1,10 +1,12 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { User, UserDocument } from "./user.model";
 import { PaginateModel } from "mongoose";
 import { CreateUserInput } from "./users.dto";
 import { compareSync, genSalt, hashSync } from "bcrypt";
 import { PASSWORD_SALT_SIZE, TREASURE_ACCOUNT_ID, TREASURE_ACCOUNT_PRIVATE_KEY } from "../common/configs/env";
+import { HederaService } from "../hedera/hedera.service";
+import { EncryptService } from "../auth/encrypt.service";
 const {
   Client,
   PrivateKey,
@@ -17,7 +19,11 @@ const {
 export class UsersService {
   constructor(
     @InjectModel(User.name)
-    private userModel: PaginateModel<UserDocument>
+    private userModel: PaginateModel<UserDocument>,
+    @Inject(forwardRef(() => HederaService))
+    private hederaService: HederaService,
+    @Inject(forwardRef(() => EncryptService))
+    private encryptService: EncryptService,
   ) {
   }
   async createUser(input: CreateUserInput) {
@@ -27,14 +33,20 @@ export class UsersService {
     if (check) {
       throw new HttpException("Email already been used", HttpStatus.BAD_REQUEST);
     }
+    const {accountId, publicKey, privateKey} = await this.hederaService.createAccount(0);
+    const derPrivateKey = privateKey.toStringDer();
     try {
       const salt = await genSalt(parseInt(PASSWORD_SALT_SIZE));
       const newUser = (await this.userModel.create({
         ...input,
+        hederaAccountId: accountId,
         password: hashSync(input.password, salt),
+        hederaPublicKey: publicKey.toStringDer(),
+        hederaPrivateKey: await this.encryptService.encryptPrivateKeyWithPassword(derPrivateKey, input.password),
         emailVerified: false,
       })).toObject();
       delete newUser.password;
+      delete newUser.hederaPrivateKey;
       return newUser;
     } catch (e) {
       console.log(e);

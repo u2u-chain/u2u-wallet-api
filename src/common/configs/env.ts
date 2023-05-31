@@ -10,6 +10,7 @@ export const JWT_TOKEN_LIFESPAN = process.env.JWT_TOKEN_LIFESPAN || "1m";
 export const JWT_REFRESH_TOKEN_LIFESPAN = process.env.JWT_REFRESH_TOKEN_LIFESPAN
 
 export const PASSWORD_SALT_SIZE = process.env.PASSWORD_SALT_SIZE;
+export const SYMMETRIC_PASSWORD_SECRET = process.env.SYMMETRIC_PASSWORD_SECRET;
 
 
 export const TREASURE_ACCOUNT_ID = process.env.TREASURE_ACCOUNT_ID;

@@ -66,7 +66,7 @@ export class AuthController {
       const payload = await this.authService.validateToken(refreshToken);
       if (payload.type === 'refresh') {
         const user = payload.sub;
-        const tokens = await this.authService.renewTokens(user);
+        const tokens = await this.authService.renewTokens(user, payload);
         return {
           status: 200,
           message: "Success",

@@ -46,13 +46,13 @@ export class User extends Document {
   emailVerified: boolean;
 
   @Prop()
-  facebookId: string;
+  hederaPrivateKey: string;
 
   @Prop()
-  googleId: string;
+  hederaPublicKey: string;
 
   @Prop()
-  githubId: string;
+  hederaAccountId: string;
 }
 
 export type UserDocument = User & Document;
