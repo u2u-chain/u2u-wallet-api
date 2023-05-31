@@ -32,6 +32,7 @@ export class AuthController {
         data: newAccount,
       };
     } catch (e) {
+      console.log(e);
       throw new HttpException(e.message || 'Invalid registration info', HttpStatus.BAD_REQUEST);
     }
   }

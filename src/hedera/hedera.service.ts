@@ -38,7 +38,7 @@ export class HederaService {
   }
 
   async createAccount(initBars = 0) {
-    const client = this.getClient();
+    const client = await this.getClient();
 
     const newAccountPrivateKey = PrivateKey.generateED25519();
     const newAccountPublicKey = newAccountPrivateKey.publicKey;
