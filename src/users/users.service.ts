@@ -54,34 +54,6 @@ export class UsersService {
     }
   }
 
-  async createHederaAccount() {
-    const treasureAccountId = TREASURE_ACCOUNT_ID;
-    const treasureAccountPrivateKey = TREASURE_ACCOUNT_PRIVATE_KEY;
-    if (treasureAccountId && treasureAccountPrivateKey) {
-      throw new HttpException("System has not been properly configured", HttpStatus.NOT_IMPLEMENTED);
-    }
-
-    const client = Client.forTestnet();
-
-    client.setOperator(treasureAccountId, treasureAccountPrivateKey);
-
-    const newAccountPrivateKey = PrivateKey.generateED25519();
-    const newAccountPublicKey = newAccountPrivateKey.publicKey;
-
-    const newAccount = await new AccountCreateTransaction()
-      .setKey(newAccountPublicKey)
-      .setInitialBalance(Hbar.fromTinybars(0))
-      .execute(client);
-
-    const getReceipt = await newAccount.getReceipt(client);
-    const newAccountId = getReceipt.accountId;
-    const accountBalance = await new AccountBalanceQuery()
-      .setAccountId(newAccountId)
-      .execute(client);
-
-    return newAccountId;
-  }
-
   getUserById(id: string) {
     return this.userModel.findOne({
       id,
