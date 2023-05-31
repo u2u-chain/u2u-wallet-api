@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { TREASURE_ACCOUNT_ID, TREASURE_ACCOUNT_PRIVATE_KEY } from "../common/configs/env";
+import { TREASURE_ACCOUNT_ID, TREASURE_ACCOUNT_PRIVATE_KEY, HEDERA_NODE_ADDRESS, HEDERA_NODE_ACCOUNT_ID } from "../common/configs/env";
+import { AccountId } from "@hashgraph/sdk";
 
 const {
   Client,
@@ -15,7 +16,7 @@ export class HederaService {
   ) {
   }
 
-  async createAccount(initBars = 0) {
+  async getClient() {
     const myAccountId = TREASURE_ACCOUNT_ID;
     const myPrivateKey = TREASURE_ACCOUNT_PRIVATE_KEY;
 
@@ -23,9 +24,21 @@ export class HederaService {
       throw new HttpException("Server has not been properly configured", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    const client = Client.forTestnet();
+    const node = {HEDERA_NODE_ADDRESS: new AccountId(parseInt(HEDERA_NODE_ACCOUNT_ID))};
+    let client;
+    if (HEDERA_NODE_ADDRESS) {
+      client = Client.forNetwork(node);
+    } else {
+      console.log('Note: Testnet is being used.')
+      client = Client.forTestnet();
+    }
 
     client.setOperator(myAccountId, myPrivateKey);
+    return client;
+  }
+
+  async createAccount(initBars = 0) {
+    const client = this.getClient();
 
     const newAccountPrivateKey = PrivateKey.generateED25519();
     const newAccountPublicKey = newAccountPrivateKey.publicKey;
