@@ -13,11 +13,13 @@ import {
 import { AuthService } from "./auth.service";
 import { CreateUserInput, LoginInput } from "../users/users.dto";
 import { AuthGuard } from "./auth.guard";
+import { UsersService } from "../users/users.service";
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
+    private userService: UsersService,
   ) {
   }
 
@@ -53,7 +55,17 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Get('profile')
   async getProfile(@Request() req) {
-    return req.user;
+    const userProfile = await this.userService.getUserById(req.user.sub.toString());
+    return {
+      ...req.user,
+      publicKey: userProfile.hederaPublicKey,
+      networkAccountId: userProfile.hederaAccountId,
+      profile: {
+        email: userProfile.email,
+        fullName: userProfile.fullName,
+        avatar: userProfile.avatar,
+      }
+    };
   }
 
   @HttpCode(HttpStatus.OK)
