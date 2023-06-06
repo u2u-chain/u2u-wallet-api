@@ -49,8 +49,8 @@ export class AuthController {
     }
     const response = await this.authService.createNetworkAccount(publicKey);
     return {
-      accountId: response.accountId,
-      publicKey: response.publicKey,
+      accountId: response.accountId.toString(),
+      publicKey: response.publicKey.toStringDer(),
     }
   }
 
