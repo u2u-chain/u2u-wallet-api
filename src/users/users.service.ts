@@ -33,7 +33,7 @@ export class UsersService {
     if (check) {
       throw new HttpException("Email already been used", HttpStatus.BAD_REQUEST);
     }
-    const {accountId, publicKey, privateKey} = await this.hederaService.createAccount(0);
+    const {accountId, privateKey} = await this.hederaService.createAccount(0);
     const derPrivateKey = privateKey.toStringDer();
     try {
       const salt = await genSalt(parseInt(PASSWORD_SALT_SIZE));
@@ -41,7 +41,7 @@ export class UsersService {
         ...input,
         hederaAccountId: accountId,
         password: hashSync(input.password, salt),
-        hederaPublicKey: publicKey.toStringDer(),
+        hederaPublicKey: privateKey.publicKey.toStringDer(),
         hederaPrivateKey: await this.encryptService.encryptPrivateKeyWithPassword(derPrivateKey, input.password),
         emailVerified: false,
       })).toObject();

@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { TREASURE_ACCOUNT_ID, TREASURE_ACCOUNT_PRIVATE_KEY, HEDERA_NODE_ADDRESS, HEDERA_NODE_ACCOUNT_ID } from "../common/configs/env";
-import { AccountId } from "@hashgraph/sdk";
+import { AccountId, PublicKey } from "@hashgraph/sdk";
 
 const {
   Client,
@@ -16,7 +16,7 @@ export class HederaService {
   ) {
   }
 
-  async getClient() {
+  getClient() {
     const myAccountId = TREASURE_ACCOUNT_ID;
     const myPrivateKey = TREASURE_ACCOUNT_PRIVATE_KEY;
 
@@ -37,14 +37,18 @@ export class HederaService {
     return client;
   }
 
-  async createAccount(initBars = 0) {
+  async createAccount(initBars = 0, importedPublicKey?: string) {
     const client = await this.getClient();
-
-    const newAccountPrivateKey = PrivateKey.generateED25519();
-    const newAccountPublicKey = newAccountPrivateKey.publicKey;
+    let privateKey, publicKey;
+    if (!importedPublicKey) {
+      privateKey = PrivateKey.generateED25519();
+      publicKey = privateKey.publicKey;
+    } else {
+      publicKey = PublicKey.fromString(importedPublicKey);
+    }
 
     const newAccount = await new AccountCreateTransaction()
-      .setKey(newAccountPublicKey)
+      .setKey(publicKey)
       .setInitialBalance(Hbar.fromTinybars(initBars))
       .execute(client);
 
@@ -52,8 +56,8 @@ export class HederaService {
 
     return {
       accountId: getReceipt.accountId,
-      privateKey: newAccountPrivateKey,
-      publicKey: newAccountPublicKey,
+      privateKey: privateKey,
+      publicKey: publicKey,
     };
   }
 }

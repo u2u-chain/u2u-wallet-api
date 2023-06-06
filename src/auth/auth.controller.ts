@@ -14,6 +14,7 @@ import { AuthService } from "./auth.service";
 import { CreateUserInput, LoginInput } from "../users/users.dto";
 import { AuthGuard } from "./auth.guard";
 import { UsersService } from "../users/users.service";
+import { response } from "express";
 
 @Controller('auth')
 export class AuthController {
@@ -36,6 +37,20 @@ export class AuthController {
     } catch (e) {
       console.log(e);
       throw new HttpException(e.message || 'Invalid registration info', HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('createNetworkAccount')
+  async createNetworkAccount(@Request() req, @Body() body) {
+    const { publicKey } = body;
+    if (!publicKey) {
+      throw new HttpException("A public key is required", HttpStatus.BAD_REQUEST);
+    }
+    const response = await this.authService.createNetworkAccount(publicKey);
+    return {
+      accountId: response.accountId,
+      publicKey: response.publicKey,
     }
   }
 
@@ -90,4 +105,5 @@ export class AuthController {
       throw new HttpException(e.message, HttpStatus.FORBIDDEN);
     }
   }
+
 }

@@ -27,6 +27,10 @@ export class AuthService {
     return this.usersService.createUser(createAccount);
   }
 
+  async createNetworkAccount(publicKey: string) {
+    return this.hederaService.createAccount(0, publicKey);
+  }
+
   async login(loginData: LoginInput) {
     const user = await this.usersService.authenticate(loginData.email, loginData.password);
     const encryptedPrivateKey = user.hederaPrivateKey;
