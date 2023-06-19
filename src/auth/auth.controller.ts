@@ -77,7 +77,7 @@ export class AuthController {
       networkAccountId: userProfile.hederaAccountId,
       profile: {
         email: userProfile.email,
-        fullName: userProfile.fullName,
+        username: userProfile.username,
         avatar: userProfile.avatar,
       }
     };

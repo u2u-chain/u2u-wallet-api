@@ -7,13 +7,6 @@ import { compareSync, genSalt, hashSync } from "bcrypt";
 import { PASSWORD_SALT_SIZE, TREASURE_ACCOUNT_ID, TREASURE_ACCOUNT_PRIVATE_KEY } from "../common/configs/env";
 import { HederaService } from "../hedera/hedera.service";
 import { EncryptService } from "../auth/encrypt.service";
-const {
-  Client,
-  PrivateKey,
-  AccountCreateTransaction,
-  AccountBalanceQuery,
-  Hbar,
-} = require("@hashgraph/sdk");
 
 @Injectable()
 export class UsersService {
@@ -25,6 +18,12 @@ export class UsersService {
     @Inject(forwardRef(() => EncryptService))
     private encryptService: EncryptService,
   ) {
+    // WARNING: MIGRATION: remove blank usernames
+    this.userModel.deleteMany({
+      username: null,
+    }).then(() => {
+      console.log('Migrated, deleted all null username accounts');
+    });
   }
   async createUser(input: CreateUserInput) {
     const check = await this.userModel.exists({

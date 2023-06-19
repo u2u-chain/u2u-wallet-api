@@ -4,13 +4,15 @@ export class CreateUserInput {
   @IsEmail({}, {always: true, message: 'Invalid email'})
   email: string;
 
-  @IsNotEmpty({always: true, message: 'Name cannot be blank'})
-  @Matches(/^([^0-9!@#$%^&*()_+=[\]{}|\\,./?<>;:"“”‘’·„‚«»‹›]+ [^0-9!@#$%^&*()_+=[\]{}|\\,./?<>;:"“”‘’·„‚«»‹›]+)+$/i, {message: 'Invalid name'})
-  fullName: string;
+  @IsNotEmpty({always: true, message: 'Username cannot be blank'})
+  @Matches(/^[a-zA-Z0-9]+$/, {message: 'Invalid username'})
+  @MinLength(3, {message: 'Your username is too short'})
+  @MaxLength(40, {message: 'Your username is too long'})
+  username: string;
 
   @IsNotEmpty({always: true, message: 'Password cannot be blank'})
   @MinLength(8, {always: true, message: 'Password is too short'})
-  @MaxLength(64, {always: true, message: 'Password is too long'})
+  @MaxLength(100, {always: true, message: 'Password is too long'})
   password: string;
 }
 
