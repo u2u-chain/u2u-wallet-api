@@ -58,7 +58,6 @@ export class AuthController {
   @Post('login')
   async login(@Body() loginDto: LoginInput) {
     const tokens = await this.authService.login(loginDto);
-    console.log('tokens', tokens);
     return {
       status: 200,
       message: "Logged in successfully",

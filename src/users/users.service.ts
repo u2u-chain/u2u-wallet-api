@@ -67,10 +67,14 @@ export class UsersService {
 
   async authenticate(email: string, password: string) {
     const account = await this.userModel.findOne({
-      email,
+      $or: [{
+        email,
+      }, {
+        username: email
+      }]
     }).select('+password');
     if (!account || !compareSync(password, account.password)) {
-      throw new HttpException('Invalid email or password', HttpStatus.FORBIDDEN);
+      throw new HttpException('Invalid email, username or password', HttpStatus.FORBIDDEN);
     }
     const accountJSON = account.toJSON();
     delete accountJSON.password;
