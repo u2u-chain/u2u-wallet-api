@@ -24,7 +24,12 @@ export class AuthService {
   ) {
   }
   createAccount(createAccount: CreateUserInput) {
-    return this.usersService.createUser(createAccount);
+    const processedAccount = {
+      ...createAccount,
+      email: createAccount.email.toLowerCase(),
+      username: createAccount.username.toLowerCase(),
+    }
+    return this.usersService.createUser(processedAccount);
   }
 
   async createNetworkAccount(publicKey: string) {
@@ -32,7 +37,7 @@ export class AuthService {
   }
 
   async login(loginData: LoginInput) {
-    const user = await this.usersService.authenticate(loginData.email, loginData.password);
+    const user = await this.usersService.authenticate(loginData.email.toLowerCase(), loginData.password);
     const encryptedPrivateKey = user.hederaPrivateKey;
     const decryptedPrivateKey = await this.encryptService.decryptPrivateKeyWithPassword(encryptedPrivateKey, loginData.password);
     const hederaEncryptedData = await this.generateAsymmetricKeyForHedera(user, decryptedPrivateKey);
